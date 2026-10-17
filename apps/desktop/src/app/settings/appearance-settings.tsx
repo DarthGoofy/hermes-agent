@@ -1,5 +1,6 @@
 import { useStore } from '@nanostores/react'
 import { useQuery } from '@tanstack/react-query'
+import type { CSSProperties } from 'react'
 import { useEffect, useState } from 'react'
 
 import { useDebounced } from '@/app/hooks/use-debounced'
@@ -71,8 +72,9 @@ import { $vibeHeartsEnabled, setVibeHeartsEnabled } from '@/store/vibe-hearts-en
 import { $zoomPercent, setZoomPercent } from '@/store/zoom'
 import { getBaseColors, useTheme } from '@/themes/context'
 import { installVscodeThemeFromMarketplace } from '@/themes/install'
+import { DEFAULT_TYPOGRAPHY } from '@/themes/presets'
 import type { DesktopTheme } from '@/themes/types'
-import { $marketplaceInstalls, isUserTheme, removeUserTheme } from '@/themes/user-themes'
+import { $marketplaceInstalls, isUserTheme, removeUserTheme, resolveTheme } from '@/themes/user-themes'
 
 import { setHermesConfigCache, useHermesConfigRecord } from '../hooks/use-config-record'
 
@@ -478,16 +480,13 @@ export function AppearanceSettings({ subpage }: AppearanceSettingsProps = {}) {
   // backend) for anything not already installed.
   const needle = normalize(query)
 
-  const filteredThemes = availableThemes
-    .filter(
-      theme =>
-        !needle ||
-        theme.label.toLowerCase().includes(needle) ||
-        theme.name.toLowerCase().includes(needle) ||
-        theme.description.toLowerCase().includes(needle)
-    )
-    // Active theme first; stable sort keeps the rest in their original order.
-    .sort((a, b) => Number(b.name === themeName) - Number(a.name === themeName))
+  const filteredThemes = availableThemes.filter(
+    theme =>
+      !needle ||
+      theme.label.toLowerCase().includes(needle) ||
+      theme.name.toLowerCase().includes(needle) ||
+      theme.description.toLowerCase().includes(needle)
+  )
 
   // Themes save per profile. Surface that only when the user actually has more
   // than one profile (single-profile installs never see the distinction).
@@ -608,9 +607,28 @@ export function AppearanceSettings({ subpage }: AppearanceSettingsProps = {}) {
                         {filteredThemes.map(theme => {
                           const active = themeName === theme.name
                           const removable = isUserTheme(theme.name)
+                          const colors = getBaseColors(theme.name, resolvedMode)
 
                           return (
-                            <div className="group relative" key={theme.name}>
+                            <div
+                              className="group relative rounded-lg"
+                              key={theme.name}
+                              style={
+                                {
+                                  backgroundColor: colors.background,
+                                  color: colors.foreground,
+                                  fontFamily:
+                                    resolveTheme(theme.name)?.typography?.fontSans ?? DEFAULT_TYPOGRAPHY.fontSans,
+                                  '--dt-primary': colors.primary,
+                                  '--ui-bg-quinary': colors.card,
+                                  '--ui-bg-elevated': colors.popover,
+                                  '--ui-text-tertiary': colors.mutedForeground,
+                                  '--ui-stroke-tertiary': colors.border,
+                                  '--chrome-action-hover': colors.accent,
+                                  '--ui-red': colors.destructive
+                                } as CSSProperties
+                              }
+                            >
                               <button
                                 className={cn('w-full p-2 text-left', selectableCardClass({ active, prominent: true }))}
                                 onClick={() => {
