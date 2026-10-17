@@ -538,6 +538,12 @@ class CLITuiRuntimeMixin:
         from hermes_cli.cli_shutdown import _gateway_owns_session_end
         if self.agent and self._agent_running and not _gateway_owns_session_end(self.agent):
             _invoke_interrupted_session_end(self.agent, self.agent.session_id, "shutdown")
+        # Before _run_cleanup arms the exit watchdog; a signal-driven exit never asks.
+        import cli as _cli_mod
+        if not _cli_mod._signal_watchdog_armed:
+            from hermes_cli.worktree_exit import ask_exit_choice
+            with suppress(Exception):
+                ask_exit_choice(_cli_mod._active_worktree)
         _run_cleanup()
         self._print_exit_summary()
         self._release_active_session()
