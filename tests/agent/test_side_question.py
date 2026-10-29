@@ -222,4 +222,3 @@ class TestForkPath:
                 assert not _Env.cleaned
             finally:
                 terminal_tool._active_environments.pop("sess-btw", None)
-

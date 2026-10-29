@@ -789,4 +789,3 @@ def test_prune_owner_lookup_survives_symlinked_scratch_and_drops_orphaned_mcp_he
         if helper.poll() is None:
             helper.kill()
             helper.wait(timeout=10)
-

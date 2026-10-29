@@ -93,4 +93,3 @@ def test_provider_that_still_fails_after_recovery_is_reported(monkeypatch):
 
     assert agent_init.resolve_memory_provider("brokenmem", say=said.append) is None
     assert len(said) == 2 and "failed to load" in said[1]
-

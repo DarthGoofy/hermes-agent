@@ -17,4 +17,3 @@ capabilities:
     - skill-integrity
   provides_middleware: []
   requires_env: []
-

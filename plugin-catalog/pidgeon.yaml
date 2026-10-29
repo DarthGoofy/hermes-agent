@@ -17,4 +17,3 @@ capabilities:
   provides_middleware: []
   requires_env:
   - PIDGEON_API_KEY
-

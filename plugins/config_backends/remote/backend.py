@@ -880,4 +880,3 @@ def _first_change(path: KeyPath, sent: Any, found: bool, got: Any) -> Optional[K
         return None if json_equal(to_wire(copy.deepcopy(got), path), sent) else path
     except ConfigValueError:
         return path
-
